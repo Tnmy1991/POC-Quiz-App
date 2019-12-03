@@ -1,11 +1,11 @@
-const express = require('express')
-const bodyParser = require("body-parser")
-const path = require('path')
-const PORT = process.env.PORT || 8080
+const express = require('express');
+const bodyParser = require("body-parser");
+const path = require('path');
+const PORT = process.env.PORT || 5000;
 const session = require('express-session');
-const flash = require('express-flash')
+const flash = require('express-flash');
 const Mongo = require("mongodb");
-const MongoClient = Mongo.MongoClient
+const MongoClient = Mongo.MongoClient;
 const uri = "mongodb+srv://admin:admin%23123@cluster0-kdxz2.mongodb.net/quizDatabase?retryWrites=true&w=majority";
 
 express()
@@ -22,13 +22,13 @@ express()
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
       if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
       collection.find({}).toArray((error, result) => {
         if(error) {
-          req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+          req.flash('error', 'Something went wrong. Please, try again after a little bit.');
           res.redirect(301, '/');
         }
         client.close();
@@ -37,7 +37,7 @@ express()
           error_msg: req.flash('error'), 
           notify_msg: req.flash('notify'),
           questions: result
-        })
+        });
       });
     });
   })
@@ -46,13 +46,13 @@ express()
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
       if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
       collection.find({ '_id': id }).toArray((error, result) => {
         if(error) {
-          req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+          req.flash('error', 'Something went wrong. Please, try again after a little bit.');
           res.redirect(301, '/');
         }
         client.close();
@@ -61,7 +61,7 @@ express()
           error_msg: req.flash('error'), 
           notify_msg: req.flash('notify'),
           question: result
-        })
+        });
       });
     });
   })
@@ -69,7 +69,7 @@ express()
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
       if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
@@ -88,11 +88,11 @@ express()
         }, function(error, result) {
           client.close();
           if(error) {
-            req.flash('error', 'Something went wrong. Unable to save question.')
+            req.flash('error', 'Something went wrong. Unable to save question.');
             res.redirect(301, '/');
           }
           if(result) {
-            req.flash('success', 'A new question successfully added.')
+            req.flash('success', 'A new question successfully added.');
             res.redirect(301, '/');
           };
         });
@@ -100,5 +100,5 @@ express()
     });
   })
   .listen(PORT, () => {
-    console.log('Express server listening on port ', PORT)
+    console.log('Express server listening on port ', PORT);
   })
