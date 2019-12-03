@@ -6,7 +6,7 @@ const session = require('express-session');
 const flash = require('express-flash');
 const Mongo = require("mongodb");
 const MongoClient = Mongo.MongoClient;
-const uri = process.env.MONGOLAB_URI;
+const uri = "mongodb+srv://admin:admin%23123@cluster0-kdxz2.mongodb.net/quizDatabase?retryWrites=true&w=majority";
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
