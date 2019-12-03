@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/header.ejs %>
+  </head>
+
+  <body>
+    <% include ../partials/nav.ejs %>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8">
+          <% include ../partials/list.ejs %>
+        </div>
+      </div>
+    </div>
+    <div class="toast-holder" aria-live="polite" aria-atomic="true">
+      <div class="toast-holder-inner">
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="true" data-delay="5000">
+          <div class="toast-header">
+            <strong class="mr-auto">Notification</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <% if (success_msg) { %>
+            <div class="toast-body"><%= success_msg %></div>
+          <% } %>
+          <% if (error_msg) { %>
+            <div class="toast-body"><%= error_msg %></div>
+          <% } %>
+          <% if (notify_msg) { %>
+            <div class="toast-body"><%= notify_msg %></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <% if (success_msg.length > 0 || error_msg.length > 0 || notify_msg.length > 0) { %>
+      <script>
+        var readyFlag = setInterval( function () {
+          if ( document.readyState !== 'complete' ) return;
+            clearInterval( readyFlag );
+
+          $('.toast').toast('show');
+        }, 100 );
+      </script>
+    <% } %>
+    
+    <% include ../partials/question-new.ejs %>
+  </body>
+</html>
