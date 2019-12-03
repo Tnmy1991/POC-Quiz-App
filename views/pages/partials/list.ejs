@@ -1,0 +1,41 @@
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Question</th>
+      <th scope="col">Edit</th>
+      <th scope="col">Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% questions.forEach(function(question){ %>
+      <tr>
+        <td><%= question.question %></td>
+        <td>
+          <a href="/?id=<%= question._id %>" class="btn btn-primary"><i class="far fa-edit"></i></a>
+        </td>
+        <td>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteQuestion-<%= question._id %>"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+      <% if( edit_id == question._id ) { %>
+        <tr id="edit-question">
+          <td colspan="3">
+            <%- include('partials/question-edit', { data: question }) %>
+          </td>
+        </tr>
+      <% } %>
+      <%- include('partials/question-delete', { data: question }) %>
+    <% }); %>
+  </tbody>
+</table>
+<% if( edit_id != null ) { %>
+  <script>
+    var scrollFlag = setInterval( function () {
+      if ( document.readyState !== 'complete' ) return;
+        clearInterval( scrollFlag );
+
+      var elmnt = document.getElementById("edit-question");
+      elmnt.scrollIntoView();
+    }, 100 );
+  </script>
+<% } %>

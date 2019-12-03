@@ -1,0 +1,24 @@
+<div class="modal fade" id="deleteQuestion-<%= data._id %>" tabindex="-1" role="dialog" aria-labelledby="Delete Question" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/process" method="post">
+          <input type="hidden" name="action" value="delete" />
+          <input type="hidden" name="id" value="<%= data._id %>" />
+          <div class="alert alert-danger" role="alert">Are you sure to delete "<%= data.question %>" question?</div>
+          <div class="form-group row">
+            <div class="col-sm-10">
+              <button type="submit" class="btn btn-danger">Confirm</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

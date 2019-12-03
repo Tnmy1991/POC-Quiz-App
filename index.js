@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require("body-parser");
-const path = require('path');
-const PORT = process.env.PORT || 5000;
+const express = require('express')
+const bodyParser = require("body-parser")
+const path = require('path')
+const PORT = process.env.PORT || 5000
 const session = require('express-session');
-const flash = require('express-flash');
+const flash = require('express-flash')
 const Mongo = require("mongodb");
-const MongoClient = Mongo.MongoClient;
-const uri = process.env.MONGOLAB_URI;
+const MongoClient = Mongo.MongoClient
+const uri = process.env.MONGOLAB_URI || "mongodb+srv://admin:admin%23123@cluster0-kdxz2.mongodb.net/quizDatabase?retryWrites=true&w=majority";
 
 express()
   .use(express.static(path.join(__dirname, 'public')))
@@ -19,16 +19,17 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
   .get('/', (req, res) => {
+    let id = typeof req.query.id != "undefined" ? req.query.id : null;
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
       if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
       collection.find({}).toArray((error, result) => {
         if(error) {
-          req.flash('error', 'Something went wrong. Please, try again after a little bit.');
+          req.flash('error', 'Something went wrong. Please, try again after a little bit.')
           res.redirect(301, '/');
         }
         client.close();
@@ -36,40 +37,43 @@ express()
           success_msg: req.flash('success'), 
           error_msg: req.flash('error'), 
           notify_msg: req.flash('notify'),
-          questions: result
-        });
+          questions: result,
+          edit_id: id
+        })
       });
     });
   })
-  .get('/edit', (req, res) => {
-    let id = new Mongo.ObjectID(req.query.id);
-    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    client.connect(err => {
-      if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
-        res.redirect(301, '/');
-      }
-      const collection = client.db("quizDatabase").collection("quizMaterials");
-      collection.find({ '_id': id }).toArray((error, result) => {
-        if(error) {
-          req.flash('error', 'Something went wrong. Please, try again after a little bit.');
+  .get('/v1/init', (req, res) => {
+    if( req.headers.authorization === "Bearer sVXHngaShoUE9r9eg3VxLcS5xsau8") {
+      const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+      client.connect(err => {
+        if(err) {
+          req.flash('error', 'Something went wrong. Please, try again after a little bit.')
           res.redirect(301, '/');
         }
-        client.close();
-        res.render('pages/question-edit', { 
-          success_msg: req.flash('success'), 
-          error_msg: req.flash('error'), 
-          notify_msg: req.flash('notify'),
-          question: result
+        const collection = client.db("quizDatabase").collection("quizMaterials");
+        collection.aggregate([{$sample: {size: 5}}, {$project: {question: 1, options: 1, point: 1, time_limit: 1}}]).toArray((error, result) => {
+          if(error) {
+            req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+            res.redirect(301, '/');
+          }
+          client.close();
+          res.json(result);
         });
       });
-    });
+    } else {
+      res.statusCode = 401;
+      res.json({
+        status: "401",
+        msg: "The user is not authorized to make the request."
+      });
+    }
   })
-  .post('/add', (req, res) => {
+  .post('/process', (req, res) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
       if(err) {
-        req.flash('error', 'Something went wrong. Please, try again after a little bit.');
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
@@ -88,11 +92,54 @@ express()
         }, function(error, result) {
           client.close();
           if(error) {
-            req.flash('error', 'Something went wrong. Unable to save question.');
+            req.flash('error', 'Something went wrong. Unable to save question.')
             res.redirect(301, '/');
           }
           if(result) {
-            req.flash('success', 'A new question successfully added.');
+            req.flash('success', 'A new question successfully added.')
+            res.redirect(301, '/');
+          };
+        });
+      } else if( req.body.action === 'edit' ) {
+        let id = new Mongo.ObjectID(req.body.id);
+        collection.updateOne(
+          { _id: id },
+          {
+            $set: { 
+              question: req.body.question,
+              options: [
+                { key: "A", label: req.body.option_a },
+                { key: "B", label: req.body.option_b },
+                { key: "C", label: req.body.option_c },
+                { key: "D", label: req.body.option_d }
+              ],
+              correct_ans: req.body.correct_option,
+              point: req.body.point,
+              time_limit: req.body.time_limit
+            },
+            $currentDate: { lastModified: true }
+          }, function(error, result) {
+            client.close();
+            if(error) {
+              req.flash('error', 'Something went wrong. Unable to save question.')
+              res.redirect(301, '/');
+            }
+            if(result) {
+              req.flash('success', 'Your changes are saved successfully.')
+              res.redirect(301, '/');
+            };
+          }
+        );
+      } else if( req.body.action === 'delete' ) {
+        let id = new Mongo.ObjectID(req.body.id);
+        collection.deleteOne({ _id: id }, function(error, result) {
+          client.close();
+          if(error) {
+            req.flash('error', 'Something went wrong. Unable to delete question.')
+            res.redirect(301, '/');
+          }
+          if(result) {
+            req.flash('success', 'you\'ve successfully delete an question.')
             res.redirect(301, '/');
           };
         });
@@ -100,5 +147,5 @@ express()
     });
   })
   .listen(PORT, () => {
-    console.log('Express server listening on port ', PORT);
+    console.log('Listening  to  port ' + PORT)
   });
