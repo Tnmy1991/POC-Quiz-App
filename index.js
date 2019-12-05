@@ -66,6 +66,84 @@ express()
       });
     });
   })
+  .post('/v1/submission', (req, res) => {
+    res.json(req.body.answer);
+    // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    // client.connect(err => {
+    //   if(err) {
+    //     req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+    //     res.redirect(301, '/');
+    //   }
+    //   const collection = client.db("quizDatabase").collection("quizMaterials");
+    //   if( req.body.action === 'add_new' ) {
+    //     collection.insertOne({
+    //       question: req.body.question,
+    //       options: [
+    //         { key: "A", label: req.body.option_a },
+    //         { key: "B", label: req.body.option_b },
+    //         { key: "C", label: req.body.option_c },
+    //         { key: "D", label: req.body.option_d }
+    //       ],
+    //       correct_ans: req.body.correct_option,
+    //       point: req.body.point,
+    //       time_limit: req.body.time_limit
+    //     }, function(error, result) {
+    //       client.close();
+    //       if(error) {
+    //         req.flash('error', 'Something went wrong. Unable to save question.')
+    //         res.redirect(301, '/');
+    //       }
+    //       if(result) {
+    //         req.flash('success', 'A new question successfully added.')
+    //         res.redirect(301, '/');
+    //       };
+    //     });
+    //   } else if( req.body.action === 'edit' ) {
+    //     let id = new Mongo.ObjectID(req.body.id);
+    //     collection.updateOne(
+    //       { _id: id },
+    //       {
+    //         $set: { 
+    //           question: req.body.question,
+    //           options: [
+    //             { key: "A", label: req.body.option_a },
+    //             { key: "B", label: req.body.option_b },
+    //             { key: "C", label: req.body.option_c },
+    //             { key: "D", label: req.body.option_d }
+    //           ],
+    //           correct_ans: req.body.correct_option,
+    //           point: req.body.point,
+    //           time_limit: req.body.time_limit
+    //         },
+    //         $currentDate: { lastModified: true }
+    //       }, function(error, result) {
+    //         client.close();
+    //         if(error) {
+    //           req.flash('error', 'Something went wrong. Unable to save question.')
+    //           res.redirect(301, '/');
+    //         }
+    //         if(result) {
+    //           req.flash('success', 'Your changes are saved successfully.')
+    //           res.redirect(301, '/');
+    //         };
+    //       }
+    //     );
+    //   } else if( req.body.action === 'delete' ) {
+    //     let id = new Mongo.ObjectID(req.body.id);
+    //     collection.deleteOne({ _id: id }, function(error, result) {
+    //       client.close();
+    //       if(error) {
+    //         req.flash('error', 'Something went wrong. Unable to delete question.')
+    //         res.redirect(301, '/');
+    //       }
+    //       if(result) {
+    //         req.flash('success', 'you\'ve successfully delete an question.')
+    //         res.redirect(301, '/');
+    //       };
+    //     });
+    //   }
+    // });
+  })
   .post('/process', (req, res) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     client.connect(err => {
