@@ -44,30 +44,22 @@ express()
     });
   })
   .get('/v1/init', (req, res) => {
-    if( req.headers.authorization === "Bearer sVXHngaShoUE9r9eg3VxLcS5xsau8") {
-      const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-      client.connect(err => {
-        if(err) {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    client.connect(err => {
+      if(err) {
+        req.flash('error', 'Something went wrong. Please, try again after a little bit.')
+        res.redirect(301, '/');
+      }
+      const collection = client.db("quizDatabase").collection("quizMaterials");
+      collection.aggregate([{$sample: {size: 5}}, {$project: {question: 1, options: 1, point: 1, time_limit: 1}}]).toArray((error, result) => {
+        if(error) {
           req.flash('error', 'Something went wrong. Please, try again after a little bit.')
           res.redirect(301, '/');
         }
-        const collection = client.db("quizDatabase").collection("quizMaterials");
-        collection.aggregate([{$sample: {size: 5}}, {$project: {question: 1, options: 1, point: 1, time_limit: 1}}]).toArray((error, result) => {
-          if(error) {
-            req.flash('error', 'Something went wrong. Please, try again after a little bit.')
-            res.redirect(301, '/');
-          }
-          client.close();
-          res.json(result);
-        });
+        client.close();
+        res.json(result);
       });
-    } else {
-      res.statusCode = 401;
-      res.json({
-        status: "401",
-        msg: "The user is not authorized to make the request."
-      });
-    }
+    });
   })
   .post('/process', (req, res) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
