@@ -83,7 +83,7 @@ express()
         res.redirect(301, '/');
       }
       const collection = client.db("quizDatabase").collection("quizMaterials");
-      collection.find({_id: {$in: questionIds}}).project({ _id: 1, correct_ans: 1, point: 1 }).toArray((error, result) => {
+      collection.find({_id: {$in: questionIds}}).project({ _id: 1, question: 1, correct_ans: 1, point: 1 }).toArray((error, result) => {
         client.close();
         if(error) {
           console.log(error);
