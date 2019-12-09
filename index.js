@@ -90,9 +90,10 @@ express()
           res.sendStatus(500);
           res.send('Something went wrong. Please, try again after a little bit.');
         }
-        let points = 0;
+        let points = totalPoints = 0;
         let response = [];
         result.forEach(value => {
+          totalPoints += parseInt(value.point);
           if(value.correct_ans === answer[value._id]) {
             points += parseInt(value.point);
             value.status = true;
@@ -102,7 +103,7 @@ express()
           response.push(value);
         });
         res.json({
-          msg: 'You got ' + points + ' out of 50.',
+          msg: 'You got ' + points + ' out of ' + totalPoints + '.',
           data: response
         });
       });
